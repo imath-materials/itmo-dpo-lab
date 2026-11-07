@@ -1,0 +1,173 @@
+{
+  "name": "ITMO DPO — Учебный пример: проверка срочности (без API)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c5ed3a2e-824a-48da-9104-0243f460fbd1",
+      "name": "Запустить вручную",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09cdaa35-b79c-48c3-a568-543bf342fb2c",
+              "name": "request",
+              "value": "Проектор не работает перед занятием",
+              "type": "string"
+            },
+            {
+              "id": "acf83fa6-6492-4c90-809a-b6967f3df08f",
+              "name": "urgent",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c515bcc2-5ec1-46a2-a37d-705a97ae29ed",
+      "name": "Тестовая заявка",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        470,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3241393e-2393-44b3-9c7c-fb41e3298f32",
+              "leftValue": "={{ $json.urgent }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "530a79e2-94da-47e8-a402-6be7d8b6fe15",
+      "name": "Это срочно?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0773889c-5c27-48f3-b362-5c91b8accd1f",
+              "name": "route",
+              "value": "Срочная ручная обработка",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2c512123-21a5-4dca-a8e2-6e22ecbfde97",
+      "name": "Срочная ветка",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        950,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "34738d8d-44bb-4752-a1ab-bf06db72f8c4",
+              "name": "route",
+              "value": "Обычная очередь",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0c271550-de0d-4d69-86ec-d8030cf96902",
+      "name": "Обычная ветка",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        950,
+        390
+      ]
+    }
+  ],
+  "connections": {
+    "Запустить вручную": {
+      "main": [
+        [
+          {
+            "node": "Тестовая заявка",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Тестовая заявка": {
+      "main": [
+        [
+          {
+            "node": "Это срочно?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Это срочно?": {
+      "main": [
+        [
+          {
+            "node": "Срочная ветка",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Обычная ветка",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}
