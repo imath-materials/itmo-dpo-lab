@@ -30,5 +30,20 @@
       const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=form.dataset.exportName;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);
     });
   });
+  // Keep every learning journal, project field and editable prompt fully visible.
+  const grow = el => {
+    if (!el || !el.isConnected || el.offsetParent === null) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.max(el.scrollHeight, 116)}px`;
+  };
+  document.querySelectorAll('textarea').forEach(el => {
+    el.setAttribute('data-autogrow','');
+    el.addEventListener('input', () => grow(el));
+    el.addEventListener('change', () => grow(el));
+    grow(el);
+  });
+  window.addEventListener('pageshow', () => document.querySelectorAll('textarea[data-autogrow]').forEach(grow));
+  document.querySelectorAll('details').forEach(el => el.addEventListener('toggle',()=>{if(el.open)el.querySelectorAll('textarea').forEach(grow)}));
+  window.addEventListener('resize', () => document.querySelectorAll('textarea[data-autogrow]').forEach(grow));
   const year=$('[data-year]');if(year)year.textContent=String(new Date().getFullYear());
 })();

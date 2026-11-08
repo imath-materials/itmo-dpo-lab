@@ -1,0 +1,159 @@
+{
+  "name": "Практика 04 — контроль данных перед обращением к ИИ",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "privacy-a",
+      "name": "Начало",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        270
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\"json\": {\"case_id\": \"SAFE-01\", \"text\": \"Нужен проектор для открытого занятия в аудитории Б-201.\"}}, {\"json\": {\"case_id\": \"EMAIL-02\", \"text\": \"Пожалуйста, ответьте пользователю user@example.test о наличии проектора.\"}}, {\"json\": {\"case_id\": \"PHONE-03\", \"text\": \"Позвоните по номеру +7 (999) 000-00-00 и уточните параметры.\"}}, {\"json\": {\"case_id\": \"SECRET-04\", \"text\": \"Пароль от тестового кабинета: secret123. Просьба подключить оборудование.\"}}, {\"json\": {\"case_id\": \"CONTEXT-05\", \"text\": \"Единственный дежурный лаборант закрытого корпуса просит перенести замену ключа.\"}}];"
+      },
+      "id": "privacy-b",
+      "name": "Вымышленные обращения",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        270
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// УЧЕБНЫЙ ПРИМЕР. Не является анонимизацией и не предназначен для реальных ПД.\n// Исходный текст остаётся виден в предыдущем узле и может попасть в историю executions.\nconst rows = $input.all();\nreturn rows.map(({json:j}) => {\n  const source = String(j.text ?? '');\n  const flags = [];\n  if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(source)) flags.push('email');\n  if (/(?:\\+7|8)[\\s(-]*\\d{3}[\\s)-]*\\d{3}[\\s-]*\\d{2}[\\s-]*\\d{2}/.test(source)) flags.push('phone');\n  if (/парол[ья]|secret|token|api[_ -]?key|ключ доступ[а-я]*/i.test(source)) flags.push('possible_secret');\n  const cleaned = source\n    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi, '[EMAIL]')\n    .replace(/(?:\\+7|8)[\\s(-]*\\d{3}[\\s)-]*\\d{3}[\\s-]*\\d{2}[\\s-]*\\d{2}/g, '[PHONE]');\n  return {json:{case_id:j.case_id, clean_text:cleaned, route:flags.length?'review':'safe', flags, note:'Учебная проверка. Отсутствие флагов НЕ доказывает анонимность.'}};\n});"
+      },
+      "id": "privacy-c",
+      "name": "Учебная проверка данных",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        270
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-prv-1",
+              "leftValue": "={{ $json.route }}",
+              "rightValue": "review",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "privacy-d",
+      "name": "Есть основание для ручной проверки?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        910,
+        270
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(x=>({json:{...x.json,status:'DO NOT SEND TO EXTERNAL MODEL',owner:'human'}}));"
+      },
+      "id": "privacy-e",
+      "name": "Только ручная проверка",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1170,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(x=>({json:{...x.json,status:'SYNTHETIC SAMPLE ONLY',owner:'human review still required'}}));"
+      },
+      "id": "privacy-f",
+      "name": "Допустимо лишь для учебного теста",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1170,
+        390
+      ]
+    }
+  ],
+  "connections": {
+    "Начало": {
+      "main": [
+        [
+          {
+            "node": "Вымышленные обращения",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Вымышленные обращения": {
+      "main": [
+        [
+          {
+            "node": "Учебная проверка данных",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Учебная проверка данных": {
+      "main": [
+        [
+          {
+            "node": "Есть основание для ручной проверки?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Есть основание для ручной проверки?": {
+      "main": [
+        [
+          {
+            "node": "Только ручная проверка",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Допустимо лишь для учебного теста",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

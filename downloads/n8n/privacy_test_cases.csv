@@ -1,0 +1,6 @@
+﻿case_id;fictional_text;expected_automated_route;teaching_note
+SAFE-01;Нужен проектор для открытого занятия в аудитории Б-201.;safe;synthetic data only
+EMAIL-02;Пожалуйста, ответьте пользователю user@example.test о наличии проектора.;review;synthetic data only
+PHONE-03;Позвоните по номеру +7 (999) 000-00-00 и уточните параметры.;review;synthetic data only
+SECRET-04;Пароль от тестового кабинета: secret123. Просьба подключить оборудование.;review;synthetic data only
+CONTEXT-05;Единственный дежурный лаборант закрытого корпуса просит перенести замену ключа.;safe;false negative: indirect identification possible
