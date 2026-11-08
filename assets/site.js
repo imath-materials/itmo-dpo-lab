@@ -47,3 +47,53 @@
   window.addEventListener('resize', () => document.querySelectorAll('textarea[data-autogrow]').forEach(grow));
   const year=$('[data-year]');if(year)year.textContent=String(new Date().getFullYear());
 })();
+
+// Local handbook search: all content is static and no query leaves the browser.
+(() => {
+  const input = document.querySelector('[data-help-search]');
+  if (!input) return;
+  const cards = Array.from(document.querySelectorAll('[data-help-item]'));
+  const count = document.querySelector('[data-help-count]');
+  const empty = document.querySelector('[data-help-empty]');
+  const normalize = value => String(value || '').toLocaleLowerCase('ru').replace(/ё/g, 'е').trim();
+  const update = () => {
+    const tokens = normalize(input.value).split(/\s+/).filter(Boolean);
+    let total = 0;
+    cards.forEach(card => {
+      const haystack = normalize(card.getAttribute('data-search'));
+      const found = tokens.every(token => haystack.includes(token));
+      card.hidden = !found;
+      if (found) total++;
+    });
+    if (count) count.textContent = `Найдено тем: ${total} из ${cards.length}`;
+    if (empty) empty.hidden = total > 0;
+  };
+  input.addEventListener('input', update);
+  document.addEventListener('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();input.focus();input.select();
+    }
+  });
+  update();
+})();
+// One click copies instructional JSON and expressions from dark code blocks.
+(() => {
+  document.querySelectorAll('[data-copy-parent]').forEach(button => button.addEventListener('click', async () => {
+    const wrap = button.closest(button.dataset.copyParent);
+    const text = wrap?.querySelector('pre')?.textContent;
+    if (!text) return;
+    let ok = false;
+    try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); ok = true; } }
+    catch (_) {}
+    if (!ok) {
+      const input = document.createElement('textarea');
+      input.value = text;input.style.position='fixed';input.style.opacity='0';
+      document.body.appendChild(input);input.select();
+      try { ok = document.execCommand('copy'); } catch (_) {};
+      input.remove();
+    }
+    const previous = button.textContent;
+    button.textContent = ok ? 'Скопировано' : 'Выделите текст';
+    setTimeout(() => button.textContent = previous, 1600);
+  }));
+})();
