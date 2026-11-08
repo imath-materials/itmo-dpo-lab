@@ -1,0 +1,135 @@
+{
+  "name": "Учебный маршрут 01 — проверка приоритета",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e1",
+      "name": "Начало",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Меняйте приоритет на 'Обычный' и проверяйте обе ветки.\nreturn [{json:{request_id:'TEST-001',topic:'Не работает проектор',priority:'Высокий',contact:'demo@example.org'}}];"
+      },
+      "id": "e2",
+      "name": "Тестовая заявка",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond1",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "Высокий",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e3",
+      "name": "Высокий приоритет?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const j=$input.first().json; return [{json:{...j,route:'Оперативное рассмотрение',status:'Требует подтверждения человеком'}}];"
+      },
+      "id": "e4",
+      "name": "Срочный маршрут",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        890,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const j=$input.first().json; return [{json:{...j,route:'Общий порядок',status:'Ожидает проверки'}}];"
+      },
+      "id": "e5",
+      "name": "Обычный маршрут",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        890,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Начало": {
+      "main": [
+        [
+          {
+            "node": "Тестовая заявка",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Тестовая заявка": {
+      "main": [
+        [
+          {
+            "node": "Высокий приоритет?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Высокий приоритет?": {
+      "main": [
+        [
+          {
+            "node": "Срочный маршрут",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Обычный маршрут",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

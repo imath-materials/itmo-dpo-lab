@@ -1,0 +1,176 @@
+{
+  "name": "Учебный маршрут 02 — форма и проверка",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Учебная заявка",
+        "formDescription": "Отправляйте только вымышленные учебные данные.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Тема",
+              "fieldType": "text",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Описание",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Приоритет",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Обычный"
+                  },
+                  {
+                    "option": "Высокий"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "buttonLabel": "Отправить",
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Учебная заявка получена"
+            }
+          }
+        }
+      },
+      "id": "f1",
+      "name": "Форма заявки",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "educational-form-no-credentials"
+    },
+    {
+      "parameters": {
+        "jsCode": "const j=$input.first().json;const topic=String(j['Тема']||'').trim().slice(0,120);const description=String(j['Описание']||'').trim().slice(0,2000);const priority=String(j['Приоритет']||'Обычный');return [{json:{topic,description,priority,valid:topic.length>3&&description.length>10,checked_by_human:false}}];"
+      },
+      "id": "f2",
+      "name": "Проверка полей",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        475,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond2",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f3",
+      "name": "Достаточно данных?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(x=>({json:{...x.json,result:'Принято для ручного рассмотрения'}}));"
+      },
+      "id": "f4",
+      "name": "Принять запись",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        910,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(x=>({json:{...x.json,result:'Вернуть на уточнение'}}));"
+      },
+      "id": "f5",
+      "name": "На уточнение",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        910,
+        405
+      ]
+    }
+  ],
+  "connections": {
+    "Форма заявки": {
+      "main": [
+        [
+          {
+            "node": "Проверка полей",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверка полей": {
+      "main": [
+        [
+          {
+            "node": "Достаточно данных?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Достаточно данных?": {
+      "main": [
+        [
+          {
+            "node": "Принять запись",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "На уточнение",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

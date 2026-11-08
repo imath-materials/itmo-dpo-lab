@@ -1,21 +1,10 @@
-# Служебные файлы и личные материалы — никогда не публиковать
-.env
-.env.*
-*.pem
-*.key
-*.p12
-*.pfx
-*credentials*
-*secret*
-*token.json
-node_modules/
-__pycache__/
-*.log
-*.zip
-!downloads/visuals_starter.zip
-ITMO_DPO_FINAL_CONTEXT*
-AI_Instruments*
-AI Культура*
-*.docx
+# Local-only
 .DS_Store
 Thumbs.db
+*.pyc
+__pycache__/
+*.log
+.env
+.env.*
+! .env.example
+node_modules/
