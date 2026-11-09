@@ -34,3 +34,19 @@ textarea:focus-visible,.field input:focus-visible,.field select:focus-visible{ou
 .related-practice{margin:35px 0;padding:24px 26px;background:#eaf3ef;border-radius:15px;border:1px solid #c7dcd1}.related-practice h2{margin:8px 0 12px;font-size:clamp(1.5rem,2.5vw,2.1rem)}.related-practice .actions{margin-top:18px}.related-practice .two-col .example{background:#fff}
 
 .workbook-preview{margin:22px 0;padding:13px;border:1px solid var(--line);border-radius:14px;background:#fff}.workbook-preview img{display:block;width:100%;height:auto;border-radius:7px}.workbook-preview figcaption{margin:12px 5px 2px;font-size:13px;color:var(--muted)}
+
+
+/* Screenshots: planned positions become real images using assets/screens.js */
+.screen-slot{margin:16px 0 20px;border:1px solid #cbdcd5;border-radius:14px;background:#fff;overflow:hidden;grid-column:2;min-width:0}
+.screen-slot-canvas{min-height:158px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:22px;background:repeating-linear-gradient(135deg,#eaf1ed 0,#eaf1ed 18px,#f4f7f4 18px,#f4f7f4 36px);color:#5c766c;text-align:center}
+.screen-slot-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#567a68}
+.screen-slot-symbol{font-size:30px;line-height:1;color:#8da9a0}
+.screen-slot-description{font-size:14px;font-weight:720;color:#3e6153;max-width:320px;line-height:1.4}
+.screen-slot figcaption{padding:12px 16px;color:#5e7368;font-size:12px;line-height:1.55}
+.screen-slot-image{display:block;width:100%;height:auto;max-height:520px;object-fit:contain;background:#e9eeeb}
+.route-card{min-width:0;border:1px solid #cadbd1;background:#fff;border-radius:16px;padding:24px 23px;display:flex;flex-direction:column}
+.route-card h3{margin:4px 0 14px}.route-card ol{margin:0 0 14px;padding-left:21px}.route-card li{font-size:14px;line-height:1.58;margin-bottom:12px}
+.route-card .micro{margin-top:auto}.route-card .screen-slot{margin-top:20px}
+.route-tag{font-size:11px!important;text-transform:uppercase;font-weight:800;letter-spacing:.1em;color:#376856;margin:0!important}
+@media(max-width:700px){.screen-slot{grid-column:1/-1}.screen-slot-canvas{min-height:125px}.route-card{padding:19px}}
+@media print{.screen-slot{break-inside:avoid}.screen-slot-canvas{min-height:110px;background:#eee}}

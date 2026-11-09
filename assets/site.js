@@ -97,3 +97,21 @@
     setTimeout(() => button.textContent = previous, 1600);
   }));
 })();
+
+
+// Replace illustrated placeholders with checked screenshots listed in screens.js.
+(() => {
+  const manifest = window.ITMO_SCREENSHOTS || {};
+  const script = Array.from(document.scripts).find(el => /\/assets\/site\.js(?:[?#]|$)/.test(el.src));
+  if (!script) return;
+  const root = new URL('../', script.src);
+  document.querySelectorAll('[data-screen-id]').forEach(figure => {
+    const file = manifest[figure.dataset.screenId];
+    if (!file || !/^assets\/screens\/[\w-]+\.(?:png|webp|jpg|jpeg)$/.test(file)) return;
+    const img = document.createElement('img');
+    img.className = 'screen-slot-image'; img.loading = 'lazy';
+    img.alt = figure.querySelector('.screen-slot-description')?.textContent || 'Снимок интерфейса';
+    img.onload = () => { const canvas = figure.querySelector('.screen-slot-canvas'); canvas?.replaceWith(img); };
+    img.src = new URL(file, root).href;
+  });
+})();
